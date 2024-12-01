@@ -48,8 +48,8 @@ function solveFirst(params: LocationIdLists): number {
 function solveSecond(locationIdLists: LocationIdLists): number {
     let sum: number = 0;
     for (const locationId of locationIdLists.leftList) {
-        const occurencesInRightList: number = locationIdLists.rightList.reduce((total, element) => total += (element === locationId ? 1 : 0), 0);
-        sum += locationId * occurencesInRightList;
+        const occurrencesInRightList: number = locationIdLists.rightList.reduce((total, element) => total += (element === locationId ? 1 : 0), 0);
+        sum += locationId * occurrencesInRightList;
     }
     return sum;
 }
