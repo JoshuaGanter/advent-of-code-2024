@@ -45,8 +45,18 @@ function solveFirst(params: LocationIdLists): number {
     return sumOfDistances;
 }
 
+function solveSecond(locationIdLists: LocationIdLists): number {
+    let sum: number = 0;
+    for (const locationId of locationIdLists.leftList) {
+        const occurencesInRightList: number = locationIdLists.rightList.reduce((total, element) => total += (element === locationId ? 1 : 0), 0);
+        sum += locationId * occurencesInRightList;
+    }
+    return sum;
+}
+
 if (import.meta.main) {
     const inputText: string = await Deno.readTextFile(join(import.meta.dirname!, "input.txt"));
     const input: LocationIdLists = parseInput(inputText);
     console.log(`Result #1: ${ solveFirst(input) }`);
+    console.log(`Result #2: ${ solveSecond(input) }`);
 }
