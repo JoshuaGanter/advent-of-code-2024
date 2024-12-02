@@ -1,6 +1,4 @@
 import { join } from "@std/path";
-import { assert } from "@std/assert/assert";
-import { assertEquals } from "@std/assert/equals";
 
 type Level = number;
 type Report = Level[];
