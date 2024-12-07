@@ -93,10 +93,75 @@ export function solveFirst(parseResult: ParseResult): number {
     return visitedPositions.length;
 }
 
+function levelIsLooping(parseResult: ParseResult): boolean {
+    const visitedPositions: { point: Point2D; direction: Direction }[] = [];
+
+    let currentPosition: Point2D = parseResult.startPosition;
+    let currentDirection: Direction = Direction.NORTH;
+
+    while (
+        currentPosition.x < parseResult.size.x && currentPosition.x >= 0 &&
+        currentPosition.y < parseResult.size.y && currentPosition.y >= 0
+    ) {
+        if (
+            visitedPositions.some((val) =>
+                val.point.x === currentPosition.x &&
+                val.point.y === currentPosition.y &&
+                val.direction === currentDirection
+            )
+        ) {
+            return true;
+        }
+        visitedPositions.push({
+            point: currentPosition,
+            direction: currentDirection,
+        });
+        let nextPosition = getNextPosition(currentPosition, currentDirection);
+        while (
+            parseResult.obstacles.some((val) =>
+                val.x === nextPosition.x && val.y === nextPosition.y
+            )
+        ) {
+            currentDirection += 1;
+            currentDirection %= 4;
+            nextPosition = getNextPosition(currentPosition, currentDirection);
+        }
+        currentPosition = nextPosition;
+    }
+
+    return false;
+}
+
+export function solveSecond(parseResult: ParseResult): number {
+    let loopingVariants: number = 0;
+    for (let x = 0; x < parseResult.size.x; x++) {
+        for (let y = 0; y < parseResult.size.y; y++) {
+            if (
+                parseResult.obstacles.some((val) => val.x === x && val.y === y)
+            ) continue;
+            if (
+                parseResult.startPosition.x === x &&
+                parseResult.startPosition.y === y
+            ) continue;
+            const newObstacles = Array.from(parseResult.obstacles);
+            newObstacles.push({ x, y });
+            if (
+                levelIsLooping({
+                    obstacles: newObstacles,
+                    size: parseResult.size,
+                    startPosition: parseResult.startPosition,
+                })
+            ) loopingVariants++;
+        }
+    }
+    return loopingVariants;
+}
+
 if (import.meta.main) {
     const inputText: string = await Deno.readTextFile(
         join(import.meta.dirname!, "input.txt"),
     );
     const input: ParseResult = parseInput(inputText);
     console.log(`Result #1: ${solveFirst(input)}`);
+    console.log(`Result #2: ${solveSecond(input)}`);
 }
