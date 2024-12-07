@@ -59,10 +59,65 @@ export function solveFirst(parseResult: ParseResult): number {
     );
 }
 
+interface FixResult {
+    queue: number[];
+    rounds: number;
+}
+
+function fixQueue(queue: FixResult, rules: Map<number, number[]>): FixResult {
+    let queueValid: boolean = true;
+    const visitedPages: number[] = [];
+    for (let i = 0; i < queue.queue.length; i++) {
+        const page: number = queue.queue[i];
+        if (!rules.has(page)) {
+            visitedPages.push(page);
+            continue;
+        }
+        const pagesBefore: number[] = rules.get(page)!.filter((val) =>
+            queue.queue.includes(val) && !visitedPages.includes(val)
+        );
+        if (pagesBefore.length === 0) {
+            visitedPages.push(page);
+            continue;
+        }
+        const index: number = queue.queue.findIndex((val) =>
+            val === pagesBefore[0]
+        );
+        queue.queue.splice(i, 0, pagesBefore[0]);
+        queue.queue.splice(index + 1, 1);
+        queueValid = false;
+        break;
+    }
+    if (!queueValid) {
+        queue.rounds += 1;
+        return fixQueue(queue, rules);
+    }
+    return queue;
+}
+
+export function solveSecond(parseResult: ParseResult): number {
+    const fixedQueues: number[][] = [];
+    for (const queue of parseResult.pages) {
+        const fixResult: FixResult = fixQueue(
+            { queue, rounds: 0 },
+            parseResult.rules,
+        );
+        if (fixResult.rounds === 0) {
+            continue;
+        }
+        fixedQueues.push(fixResult.queue);
+    }
+    return fixedQueues.reduce(
+        (total, queue) => total + queue[Math.floor(queue.length / 2)],
+        0,
+    );
+}
+
 if (import.meta.main) {
     const inputText: string = await Deno.readTextFile(
         join(import.meta.dirname!, "input.txt"),
     );
     const input: ParseResult = parseInput(inputText);
     console.log(`Result #1: ${solveFirst(input)}`);
+    console.log(`Result #2: ${solveSecond(input)}`);
 }
