@@ -1,5 +1,5 @@
 import { assertEquals } from "jsr:@std/assert";
-import { parseInput, solveFirst } from "./day10.ts";
+import { parseInput, solveFirst, solveSecond } from "./day10.ts";
 
 const EXAMPLE_DATA: string = `89010123
 78121874
@@ -12,4 +12,8 @@ const EXAMPLE_DATA: string = `89010123
 
 Deno.test("Day 10, first part example works", () => {
     assertEquals(solveFirst(parseInput(EXAMPLE_DATA)), 36);
+});
+
+Deno.test("Day 10, second part example works", () => {
+    assertEquals(solveSecond(parseInput(EXAMPLE_DATA)), 81);
 });
